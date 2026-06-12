@@ -78,7 +78,7 @@
     <header>
         <div class="nav-container">
             <a href="index.html" class="logo">
-                Bet ker<span></span>
+                BET<span>KER</span>
             </a>
 
             <div class="search-wrapper">
@@ -277,11 +277,11 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // Biến trạng thái toàn cục
-        let allProducts = [];
-        let currentBrand = "all";          
-        let currentSort = "default";       
-        let searchQuery = "";              
-        let displayLimit = 10;             
+     let allProducts = [];
+let currentBrand = "all";
+let currentSort = "default";
+let searchQuery = ""; // <--- PHẢI CÓ BIẾN NÀY Ở NGOÀI CÙNG
+let displayLimit = 10;            
 
         // 1. Kiểm tra tài khoản
         onAuthStateChanged(auth, async (user) => {
@@ -368,7 +368,9 @@
 
             let items = [...allProducts];
 
-            if (searchQuery) items = items.filter(shoe => shoe.name.toLowerCase().includes(searchQuery));
+            if (searchQuery) {
+        items = items.filter(shoe => shoe.name.toLowerCase().includes(searchQuery));
+    }
             if (currentBrand !== "all") items = items.filter(shoe => shoe.brand && shoe.brand.toLowerCase() === currentBrand);
 
             const getRealPrice = (p) => p.discount > 0 ? p.price - (p.price * p.discount / 100) : p.price;
@@ -486,14 +488,23 @@
             });
         });
 
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) {
-            searchInput.addEventListener("input", function(e) {
-                searchQuery = e.target.value.toLowerCase().trim();
-                displayLimit = 10; 
-                renderAllProducts();
-            });
-        }
+       
+        // Tìm kiếm
+// Thay thế đoạn lắng nghe sự kiện tìm kiếm bằng đoạn này
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+    searchInput.addEventListener("input", function(e) {
+        // 1. Cập nhật biến toàn cục searchQuery bằng giá trị người dùng vừa gõ
+        searchQuery = e.target.value.toLowerCase().trim();
+        
+        // 2. Reset số lượng hiển thị về 10 để tránh lỗi phân trang khi tìm kiếm
+        displayLimit = 10;
+        
+        // 3. Gọi lại hàm renderAllProducts để nó lọc dữ liệu theo searchQuery mới
+        renderAllProducts();
+    });
+}
+        
 
         // Logic thêm giỏ hàng
         window.addToCart = function(id, name, price, image) {
