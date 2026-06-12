@@ -281,7 +281,7 @@
 let currentBrand = "all";
 let currentSort = "default";
 let searchQuery = ""; // <--- PHẢI CÓ BIẾN NÀY Ở NGOÀI CÙNG
-let displayLimit = 10;            
+let displayLimit = 8;            
 
         // 1. Kiểm tra tài khoản
         onAuthStateChanged(auth, async (user) => {
@@ -460,7 +460,7 @@ let displayLimit = 10;
         if (priceSortSelect) {
             priceSortSelect.addEventListener("change", function(e) {
                 currentSort = e.target.value;
-                displayLimit = 10; 
+                displayLimit = 8; 
                 renderAllProducts();
             });
         }
