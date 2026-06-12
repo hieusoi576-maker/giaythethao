@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tài Khoản - Bet ker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { 
+            --primary-color: #ff4500; 
+            --bg-dark: #1a1a1a; 
+            --bg-light: #f4f5f7; 
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg-light); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* ================= Header Styles ================= */
+        header { background: var(--bg-dark); color: var(--text-light); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .logo { font-size: 24px; font-weight: 800; text-decoration: none; color: var(--text-light); }
+        .logo span { color: var(--primary-color); }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav ul li a { color: #ccc; text-decoration: none; font-weight: 400; transition: 0.3s; }
+        nav ul li a:hover { color: var(--primary-color); }
+        .header-auth a { color: var(--text-light); text-decoration: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; transition: 0.3s; }
+        .header-auth .btn-login { border: 1px solid var(--text-light); margin-right: 10px; }
+        .header-auth .btn-login:hover { background: var(--text-light); color: var(--bg-dark); }
+        .header-auth .btn-reg-active { background: var(--primary-color); }
+        .header-auth .btn-reg-active:hover { opacity: 0.9; }
+
+        /* ================= Main Content / Register Form ================= */
+        .main-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
+        .auth-card { background: #fff; width: 100%; max-width: 450px; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .auth-card h2 { text-align: center; color: var(--text-dark); margin-bottom: 25px; font-weight: 600; }
+        
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+        .form-group input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; transition: 0.3s; }
+        .form-group input:focus { border-color: var(--primary-color); box-shadow: 0 0 5px rgba(255, 69, 0, 0.2); }
+        
+        .btn-auth-submit { background: var(--primary-color); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-auth-submit:hover { opacity: 0.9; }
+
+        .auth-redirect { text-align: center; margin-top: 25px; font-size: 14px; color: #666; }
+        .auth-redirect a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+
+        /* ================= Footer Styles ================= */
+        footer { background: var(--bg-dark); color: #aaa; padding: 40px 5% 20px 5%; font-size: 14px; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px; }
+        .footer-col h3 { color: var(--text-light); margin-bottom: 15px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col ul li a { color: #aaa; text-decoration: none; transition: 0.3s; }
+        .footer-col ul li a:hover { color: var(--primary-color); padding-left: 5px; }
+        .footer-socials { display: flex; gap: 15px; margin-top: 10px; }
+        .footer-socials a { color: #aaa; font-size: 18px; transition: 0.3s; }
+        .footer-socials a:hover { color: var(--primary-color); }
+        .footer-bottom { border-top: 1px solid #333; padding-top: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">Bet<span>ker</span></a>
+
+        <div class="header-auth">
+            <a href="dangnhap.html" class="btn-login">Đăng Nhập</a>
+            <a href="dangky.html" class="btn-reg-active">Đăng Ký</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="auth-card">
+            <h2>Tạo tài khoản mới</h2>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="regName" placeholder="Họ và tên của bạn" required>
+                </div>
+                <div class="form-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="regEmail" placeholder="Địa chỉ Email" required>
+                </div>
+                <div class="form-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="regPassword" placeholder="Mật khẩu (Tối thiểu 6 ký tự)" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input type="password" id="regConfirmPassword" placeholder="Xác nhận mật khẩu" required>
+                </div>
+                
+                <button type="submit" class="btn-auth-submit" id="btnSubmit">Đăng Ký Tài Khoản</button>
+            </form>
+
+            <div class="auth-redirect">
+                Bạn đã có tài khoản? <a href="dangnhap.html">Đăng nhập ngay</a>
+            </div>
+        </div>
+    </main>
+
+     <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo footer-logo">Leopard<span>Store</span></a>
+                    <p class="company-desc">Hệ thống phân phối giày thể thao Sneaker chính hãng hàng đầu Việt Nam. Mang lại trải nghiệm di chuyển tuyệt vời trên từng bước chân.</p>
+                    <ul class="contact-details">
+                        <li><i class="fa-solid fa-location-dot"></i> <span>Địa chỉ: Quận Kiến An, Thành phố Hải Phòng</span></li>
+                        <li><i class="fa-solid fa-phone"></i> <span>Hotline mua hàng: 098.243.6234</span></li>
+                        <li><i class="fa-solid fa-envelope"></i> <span>Email hỗ trợ: contact@leopardstore.vn</span></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Hướng Dẫn & Trợ Giúp</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Hướng dẫn mua hàng Online</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy trình giao nhận & vận chuyển</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy định đổi trả & hoàn tiền</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo mật thông tin</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Bảng tính size giày chuẩn</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Chính Sách Cửa Hàng</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Khách hàng thân thiết (VIP)</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo hành sản phẩm</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Điều khoản và điều kiện dịch vụ</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Đăng ký cộng tác viên (CTV)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Bản Tin Khuyến Mãi</h4>
+                    <p>Nhập email để nhận thông tin bộ sưu tập mới nhất và các chương trình Sale ngập tràn từ Leopard Store.</p>
+                    <div class="newsletter-box">
+                        <input type="email" placeholder="Email của bạn...">
+                        <button type="button" title="Đăng ký"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/share/17sjBHtVQn/?mibextid=wwXIfr" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/_nqhieu?igsh=cGh5d3FkMGIzNjdy" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@sannhocoden1511?_r=1&_t=ZS-978aPfL4yJd" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/@sneakerdailyvn?si=m-TYCVaV0xXffV3w" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Xử lý Đăng Ký bằng Email & Password
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("regName").value.trim();
+            const email = document.getElementById("regEmail").value.trim();
+            const password = document.getElementById("regPassword").value;
+            const confirmPassword = document.getElementById("regConfirmPassword").value;
+            const btnSubmit = document.getElementById("btnSubmit");
+
+            // Kiểm tra mật khẩu khớp nhau
+            if (password !== confirmPassword) {
+                alert("Mật khẩu xác nhận không trùng khớp!");
+                return;
+            }
+
+            btnSubmit.innerText = "Đang xử lý...";
+            btnSubmit.disabled = true;
+
+            try {
+                // 1. Tạo tài khoản trên Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Cập nhật tên hiển thị (displayName) vào Auth Profile
+                await updateProfile(user, { displayName: name });
+
+                // 3. Lưu thông tin User vào Firestore (bộ sưu tập "users") để quản lý phân quyền
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    displayName: name,
+                    email: email,
+                    role: "customer", // Mặc định tài khoản đăng ký mới là khách hàng
+                    createdAt: new Date().toISOString()
+                });
+
+                alert("Đăng ký tài khoản thành công!");
+                window.location.href = "dangnhap.html"; // Chuyển hướng sang trang đăng nhập
+
+            } catch (error) {
+                console.error("Lỗi đăng ký:", error);
+                // Việt hóa thông báo lỗi từ Firebase
+                if (error.code === "auth/email-already-in-use") {
+                    alert("Địa chỉ email này đã được đăng ký cho tài khoản khác!");
+                } else if (error.code === "auth/invalid-email") {
+                    alert("Định dạng email không hợp lệ!");
+                } else if (error.code === "auth/weak-password") {
+                    alert("Mật khẩu quá yếu! Vui lòng chọn mật khẩu từ 6 ký tự trở lên.");
+                } else {
+                    alert("Đăng ký thất bại: " + error.message);
+                }
+            } finally {
+                btnSubmit.innerText = "Đăng Ký Tài Khoản";
+                btnSubmit.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

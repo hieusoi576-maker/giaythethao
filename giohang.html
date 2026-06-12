@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng - Bet ker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { 
+            background: var(--bg-gray); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .main-content { 
+            flex: 1; 
+            padding: 40px 0; 
+        }
+        .page-title { 
+            margin-bottom: 30px; 
+            font-size: 28px; 
+            font-weight: 700; 
+        }
+        .cart-wrapper { 
+            display: grid; 
+            grid-template-columns: 2.2fr 1fr; 
+            gap: 30px; 
+            align-items: start; 
+        }
+        .cart-table-container { 
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow-sm); 
+        }
+        .cart-empty { 
+            text-align: center; 
+            padding: 50px 20px; 
+            display: none; 
+        }
+        .cart-empty i { 
+            font-size: 60px; 
+            color: #ccc; 
+            margin-bottom: 20px; 
+        }
+        .cart-empty p { 
+            margin-bottom: 20px; 
+            color: var(--text-light); 
+        }
+        .btn-shop-now { 
+            background: var(--primary-color); 
+            color: #fff; 
+            text-decoration: none; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            display: inline-block; 
+            transition: var(--transition); 
+        }
+        .btn-shop-now:hover { 
+            background: var(--primary-hover); 
+        }
+        .cart-item { 
+            display: grid; 
+            grid-template-columns: 100px 2fr 1fr 120px 40px; 
+            gap: 20px; 
+            align-items: center; 
+            padding: 20px 0; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .cart-item:last-child { 
+            border-bottom: none; 
+        }
+        .product-img { 
+            width: 100px; 
+            height: 100px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            background: var(--bg-card); 
+        }
+        .product-info h4 { 
+            font-size: 16px; 
+            margin-bottom: 5px; 
+            font-weight: 600; 
+        }
+        .product-info p { 
+            color: var(--text-light); 
+            font-size: 13px; 
+        }
+        .product-price { 
+            font-weight: 600; 
+            color: var(--text-dark); 
+        }
+        .quantity-control { 
+            display: flex; 
+            align-items: center; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            width: fit-content; 
+            overflow: hidden; 
+        }
+        .quantity-control button { 
+            background: #f9f9f9; 
+            border: none; 
+            width: 32px; 
+            height: 32px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .quantity-control button:hover { 
+            background: #eee; 
+        }
+        .quantity-control input { 
+            width: 40px; 
+            text-align: center; 
+            border: none; 
+            border-left: 1px solid var(--border-color); 
+            border-right: 1px solid var(--border-color); 
+            height: 32px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            outline: none; 
+        }
+        .btn-remove { 
+            background: none; 
+            border: none; 
+            color: #ff3b30; 
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            text-align: center; 
+        }
+        .btn-remove:hover { 
+            transform: scale(1.1); 
+        }
+        .cart-summary { 
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow-sm); 
+            position: sticky; 
+            top: 100px; 
+        }
+        .summary-title { 
+            font-size: 18px; 
+            font-weight: 600; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .summary-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            color: var(--text-light); 
+        }
+        .summary-row.total { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: var(--text-dark); 
+            margin-top: 15px; 
+            padding-top: 15px; 
+            border-top: 1px solid var(--border-color); 
+        }
+        .summary-row.total span:last-child { 
+            color: var(--primary-color); 
+        }
+        .checkout-form { 
+            margin-top: 20px; 
+        }
+        .checkout-form h4 { 
+            font-size: 14px; 
+            margin-bottom: 10px; 
+            color: var(--text-dark); 
+        }
+        .checkout-form input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            margin-bottom: 10px; 
+            outline: none; 
+            font-size: 13px; 
+        }
+        .checkout-form input:focus { 
+            border-color: var(--primary-color); 
+        }
+        .btn-checkout { 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            margin-top: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .btn-checkout:hover { 
+            background: var(--primary-hover); 
+            box-shadow: 0 4px 12px rgba(255,69,0,0.2); 
+        }
+        @media (max-width: 900px) {
+            .cart-wrapper { grid-template-columns: 1fr; }
+            .cart-item { grid-template-columns: 80px 1fr; gap: 15px; }
+            .product-price, .quantity-control, .btn-remove { grid-column: 2; margin-top: 5px; }
+            .btn-remove { text-align: left; width: fit-content; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Bet ker<span></span></a>
+            <div class="user-actions">
+                <div class="header-auth" id="headerAuthNav">
+                    <a href="dangnhap.html" class="action-btn" style="border: 1px solid #fff; padding: 5px 15px; border-radius: 20px;">
+                        <i class="fa-regular fa-user"></i> Đăng Nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="index.html"><i class="fa-solid fa-house"></i> Trang Chủ</a></li>
+                <li><a href="gioithieu.html"><i class="fa-solid fa-info-circle"></i> Giới Thiệu</a></li>
+                <li><a href="giohang.html" class="active"><i class="fa-solid fa-bag-shopping"></i> Giỏ Hàng</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Giỏ hàng của bạn</h1>
+            <div class="cart-wrapper">
+                <div class="cart-table-container">
+                    <div id="cartItemsList"></div>
+                    <div class="cart-empty" id="cartEmptyState">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <p>Giỏ hàng của bạn đang trống rỗng.</p>
+                        <a href="index.html" class="btn-shop-now">Tiếp tục mua sắm</a>
+                    </div>
+                </div>
+
+                <div class="cart-summary" id="cartSummaryBlock">
+                    <div class="summary-title">Tóm tắt đơn hàng</div>
+                    <div class="summary-row">
+                        <span>Tạm tính</span>
+                        <span id="txtSubtotal">0đ</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span>Miễn phí</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng tiền</span>
+                        <span id="txtTotal">0đ</span>
+                    </div>
+
+                    <div class="checkout-form">
+                        <h4>Thông tin giao hàng</h4>
+                        <input type="text" id="orderCustomerName" placeholder="Họ và tên người nhận" required>
+                        <input type="tel" id="orderPhone" placeholder="Số điện thoại liên hệ" required>
+                        <input type="text" id="orderAddress" placeholder="Địa chỉ giao hàng đầy đủ" required>
+                    </div>
+
+                    <button class="btn-checkout" id="btnPlaceOrder">
+                        <i class="fa-solid fa-credit-card"></i> Xác Nhận Thanh Toán
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo footer-logo">BET<span>KER</span></a>
+                    <p class="company-desc">Hệ thống phân phối giày thể thao Sneaker chính hãng hàng đầu Việt Nam. Mang lại trải nghiệm di chuyển tuyệt vời trên từng bước chân.</p>
+                    <ul class="contact-details">
+                        <li><i class="fa-solid fa-location-dot"></i> <span>Địa chỉ: Quận Kiến An, Thành phố Hải Phòng</span></li>
+                        <li><i class="fa-solid fa-phone"></i> <span>Hotline mua hàng: 0866.229.924</span></li>
+                        <li><i class="fa-solid fa-envelope"></i> <span>Email hỗ trợ: admin@betker.vn</span></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Hướng Dẫn & Trợ Giúp</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Hướng dẫn mua hàng Online</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy trình giao nhận & vận chuyển</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy định đổi trả & hoàn tiền</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo mật thông tin</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Bảng tính size giày chuẩn</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Chính Sách Cửa Hàng</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Khách hàng thân thiết (VIP)</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo hành sản phẩm</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Điều khoản và điều kiện dịch vụ</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Đăng ký cộng tác viên (CTV)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Bản Tin Khuyến Mãi</h4>
+                    <p>Nhập email để nhận thông tin bộ sưu tập mới nhất và các chương trình Sale ngập tràn từ Bet Ker.</p>
+                    <div class="newsletter-box">
+                        <input type="email" placeholder="Email của bạn...">
+                        <button type="button" title="Đăng ký"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/share/17sjBHtVQn/?mibextid=wwXIfr" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/_nqhieu?igsh=cGh5d3FkMGIzNjdy" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@sannhocoden1511?_r=1&_t=ZS-978aPfL4yJd" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/@sneakerdailyvn?si=m-TYCVaV0xXffV3w" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>  
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        let currentUserId = null;
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        onAuthStateChanged(auth, (user) => {
+            const authNav = document.getElementById("headerAuthNav");
+            if (user) {
+                currentUserId = user.uid;
+                authNav.innerHTML = `<a href="#" class="action-btn" style="color:var(--primary-color); font-weight:600;"><i class="fa-solid fa-user"></i> ${user.displayName || 'Tài khoản'}</a>`;
+                if(user.displayName) {
+                    document.getElementById("orderCustomerName").value = user.displayName;
+                }
+            } else {
+                currentUserId = null;
+                authNav.innerHTML = `<a href="dangnhap.html" class="action-btn" style="border: 1px solid #fff; padding: 5px 15px; border-radius: 20px;"><i class="fa-regular fa-user"></i> Đăng Nhập</a>`;
+            }
+        });
+
+        function formatVND(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function renderCart() {
+            const itemsContainer = document.getElementById("cartItemsList");
+            const emptyState = document.getElementById("cartEmptyState");
+            const summaryBlock = document.getElementById("cartSummaryBlock");
+
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = "";
+                emptyState.style.display = "block";
+                summaryBlock.style.display = "none";
+                return;
+            }
+
+            emptyState.style.display = "none";
+            summaryBlock.style.display = "block";
+            itemsContainer.innerHTML = "";
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                itemsContainer.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" class="product-img">
+                        <div class="product-info">
+                            <h4>${item.name}</h4>
+                            <p>Size: ${item.size || 41}</p>
+                        </div>
+                        <div class="product-price">${formatVND(item.price)}</div>
+                        <div class="quantity-control">
+                            <button onclick="updateQty(${index}, -1)">-</button>
+                            <input type="text" value="${item.quantity}" readonly>
+                            <button onclick="updateQty(${index}, 1)">+</button>
+                        </div>
+                        <button class="btn-remove" onclick="removeItem(${index})">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>`;
+            });
+
+            document.getElementById("txtSubtotal").innerText = formatVND(subtotal);
+            document.getElementById("txtTotal").innerText = formatVND(subtotal);
+        }
+
+        window.updateQty = function(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity < 1) cart[index].quantity = 1;
+            localStorage.setItem("cart", JSON.stringify(cart));
+            renderCart();
+        };
+
+        window.removeItem = function(index) {
+            if(confirm("Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+                cart.splice(index, 1);
+                localStorage.setItem("cart", JSON.stringify(cart));
+                renderCart();
+            }
+        };
+
+        document.getElementById("btnPlaceOrder").addEventListener("click", async () => {
+            if (cart.length === 0) return;
+            if (!currentUserId) {
+                alert("Vui lòng Đăng nhập trước khi thanh toán đơn hàng!");
+                window.location.href = "dangnhap.html";
+                return;
+            }
+
+            const name = document.getElementById("orderCustomerName").value.trim();
+            const phone = document.getElementById("orderPhone").value.trim();
+            const address = document.getElementById("orderAddress").value.trim();
+            const btnOrder = document.getElementById("btnPlaceOrder");
+
+            if (!name || !phone || !address) {
+                alert("Vui lòng điền đầy đủ thông tin giao nhận hàng!");
+                return;
+            }
+
+            btnOrder.innerText = "Đang xử lý đặt hàng...";
+            btnOrder.disabled = true;
+            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            try {
+                await addDoc(collection(db, "orders"), {
+                    userId: currentUserId,
+                    customerName: name,
+                    customerPhone: phone,
+                    shippingAddress: address,
+                    items: cart,
+                    totalPrice: totalAmount,
+                    status: "pending",
+                    createdAt: new Date().toISOString()
+                });
+                alert("Đặt hàng thành công!");
+                localStorage.removeItem("cart");
+                window.location.href = "index.html";
+            } catch (error) { alert("Lỗi khi tạo đơn hàng: " + error.message); }
+            finally {
+                btnOrder.innerText = "Xác Nhận Thanh Toán";
+                btnOrder.disabled = false;
+            }
+        });
+
+        renderCart();
+    </script>
+</body>
+</html>

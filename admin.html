@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Trị Hệ Thống - Bet ker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --primary-color: #ff4500; --sidebar-bg: #1a1a1a; --bg-light: #f4f5f7; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { display: flex; background: var(--bg-light); min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; padding-top: 20px; height: 100vh; position: sticky; top: 0;}
+        .logo { font-size: 24px; font-weight: 800; text-align: center; display: block; color: white; text-decoration: none; margin-bottom: 30px; }
+        .logo span { color: var(--primary-color); }
+        .nav-links { list-style: none; }
+        .nav-links li { padding: 15px 25px; cursor: pointer; border-left: 4px solid transparent; transition: 0.3s; }
+        .nav-links li.active { background: rgba(255, 69, 0, 0.1); border-left-color: var(--primary-color); color: var(--primary-color); }
+        .nav-links li:hover { background: rgba(255, 255, 255, 0.05); }
+        
+        /* Content */
+        .main-content { flex: 1; padding: 30px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .panel { background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* Form & Table */
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        input, select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 6px; width: 100%; outline: none; font-family: inherit; }
+        .btn-submit { background: var(--primary-color); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 16px; transition: 0.3s; }
+        .btn-submit:hover { background: #e03e00; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        
+        /* Action Buttons */
+        .action-btns { display: flex; gap: 8px; }
+        button.del-btn { background: #dc3545; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        button.del-btn:hover { background: #c82333; }
+        button.edit-btn { background: #007bff; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        button.edit-btn:hover { background: #0056b3; }
+        
+        .btn-cancel { background: #6c757d !important; }
+        .btn-cancel:hover { background: #5a6268 !important; }
+        .btn-update { background: #28a745 !important; }
+        .btn-update:hover { background: #218838 !important; }
+
+        /* Order Select Style */
+        .status-select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-weight: 600; cursor: pointer; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="index.html" class="logo">Bet<span>ker</span></a>
+        <ul class="nav-links">
+            <li class="active" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Thống kê</li>
+            <li data-tab="products"><i class="fa-solid fa-boxes-stacked"></i> Sản phẩm</li>
+            <li data-tab="orders"><i class="fa-solid fa-cart-shopping"></i> Đơn hàng</li>
+            <li data-tab="subscribers"><i class="fa-solid fa-envelope-open-text"></i> Khách đăng ký</li>
+            <li style="margin-top: 20px;"><a href="index.html" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Về cửa hàng</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard" class="tab-content active">
+            <h2>Bảng Điều Khiển</h2>
+            <div style="display:flex; gap:20px; margin-top:20px;">
+                <div class="panel" style="flex:1;">
+                    <h3>Tổng Doanh Thu</h3>
+                    <h2 id="total-revenue" style="color: var(--primary-color); font-size: 32px; margin-top: 10px;">0đ</h2>
+                </div>
+                <div class="panel" style="flex:1;">
+                    <h3>Đơn Hàng Giao Dịch</h3>
+                    <h2 id="total-orders" style="color: #28a745; font-size: 32px; margin-top: 10px;">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div id="products" class="tab-content">
+            <div class="panel">
+                <h3 id="formTitle" style="margin-bottom: 20px;">Thêm Sản Phẩm Mới</h3>
+                <form id="addProductForm" class="form-grid">
+                    <input type="text" id="pName" placeholder="Tên sản phẩm" required>
+                    
+                    <select id="pBrand" required>
+                        <option value="" disabled selected>Chọn thương hiệu (Nike, Adidas...)</option>
+                        <option value="nike">Nike</option>
+                        <option value="adidas">Adidas</option>
+                        <option value="jordan">Jordan</option>
+                        <option value="puma">Puma</option>
+                    </select>
+
+                    <input type="number" id="pPrice" placeholder="Giá gốc (VNĐ)" required>
+                    <input type="number" id="pDiscount" placeholder="Giảm giá % (nhập 0 nếu không giảm)" value="0">
+                    <input type="number" id="pOrder" placeholder="Thứ tự hiển thị ưu tiên (1,2,3...)" value="1">
+                    <input type="url" id="pImage" placeholder="Link ảnh chính (URL)" required>
+                    
+                    <textarea id="pDesc" placeholder="Mô tả chi tiết sản phẩm (chất liệu, công nghệ, thiết kế...)" style="grid-column: span 2; min-height: 120px; resize: vertical;"></textarea>
+
+                    <div style="grid-column: span 2; display: flex; align-items: center; gap: 10px; margin: 5px 0;">
+                        <input type="checkbox" id="pFeatured" style="width: 20px; height: 20px; cursor: pointer;">
+                        <label for="pFeatured" style="font-weight: 600; cursor: pointer; color: var(--primary-color);">🌟 Đánh dấu là Sản Phẩm Nổi Bật</label>
+                    </div>
+
+                    <div style="grid-column: span 2; display: flex; gap: 15px;">
+                        <button type="submit" id="btnSubmitProduct" class="btn-submit" style="flex: 2;">Thêm Sản Phẩm Vào Kho</button>
+                        <button type="button" id="btnCancelEdit" class="btn-submit btn-cancel" onclick="cancelEditMode()" style="display: none; flex: 1;">Hủy Chỉnh Sửa</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h3 style="margin-bottom: 20px;">Danh Sách Sản Phẩm</h3>
+                <table>
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th>STT</th>
+                            <th>Tên SP</th>
+                            <th>Thương Hiệu</th>
+                            <th>Giá Bán</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-product-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="orders" class="tab-content">
+            <div class="panel">
+                <h3 style="margin-bottom: 20px;">Danh Sách Đơn Hàng</h3>
+                <table>
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th>Mã ĐH</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-order-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="subscribers" class="tab-content">
+            <div class="panel">
+                <h3 style="margin-bottom: 20px;">Danh Sách Khách Đăng Ký Nhận Tin</h3>
+                <table>
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th>Email</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-subscriber-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.nav-links li[data-tab]');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+    </script>
+
+    <script type="module">
+        import { db, auth } from "./firebase-config.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        window.globalProducts = [];
+        window.editingProductId = null; 
+
+        window.loadData = async function() {
+            // 1. Lấy dữ liệu Sản Phẩm
+            const pSnap = await getDocs(collection(db, "shoes"));
+            const pList = document.getElementById("admin-product-list");
+            pList.innerHTML = "";
+            window.globalProducts = [];
+            
+            pSnap.forEach(d => window.globalProducts.push({id: d.id, ...d.data()}));
+            
+            window.globalProducts.sort((a,b) => (a.order || 99) - (b.order || 99)).forEach(p => {
+                let price = p.price - (p.price * (p.discount || 0)/100);
+                let featuredTag = p.isFeatured ? '<span style="background:#ff4500; color:white; padding:3px 8px; border-radius:12px; font-size:11px; margin-left:8px; vertical-align:middle;">Nổi bật</span>' : '';
+                
+                pList.innerHTML += `
+                    <tr>
+                        <td>${p.order}</td>
+                        <td style="font-weight: 600;">${p.name} ${featuredTag}</td>
+                        <td style="text-transform: capitalize; color: #ff4500;">${p.brand || 'Chưa phân loại'}</td>
+                        <td>${price.toLocaleString()}đ</td>
+                        <td class="action-btns">
+                            <button class="edit-btn" onclick="enterEditMode('${p.id}')" title="Sửa sản phẩm"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="del-btn" onclick="delDoc('shoes','${p.id}')" title="Xóa sản phẩm"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+
+            // 2. Lấy dữ liệu Đơn Hàng
+            const oSnap = await getDocs(collection(db, "orders"));
+            const oList = document.getElementById("admin-order-list");
+            oList.innerHTML = "";
+            let rev = 0;
+            let orderCount = 0;
+            
+            oSnap.forEach(d => {
+                let o = d.data();
+                rev += Number(o.totalPrice || 0);
+                orderCount++;
+                
+                let currentStatus = o.status || "pending";
+
+                oList.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 600;">#${d.id.slice(0,4).toUpperCase()}</td>
+                        <td>
+                            ${o.customerName}<br>
+                            <span style="font-size: 13px; color: #666;">📞 ${o.customerPhone || 'N/A'}</span>
+                        </td>
+                        <td style="font-weight: bold; color: #d35400;">${Number(o.totalPrice).toLocaleString()}đ</td>
+                        <td>
+                            <select class="status-select" onchange="updateOrderStatus('${d.id}', this.value)" 
+                                style="color: ${currentStatus === 'completed' ? 'green' : currentStatus === 'cancelled' ? 'red' : '#333'}">
+                                <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>🕒 Chờ duyệt</option>
+                                <option value="processing" ${currentStatus === 'processing' ? 'selected' : ''}>⚙️ Đang xử lý</option>
+                                <option value="shipped" ${currentStatus === 'shipped' ? 'selected' : ''}>🚚 Đang giao</option>
+                                <option value="completed" ${currentStatus === 'completed' ? 'selected' : ''}>✅ Hoàn thành</option>
+                                <option value="cancelled" ${currentStatus === 'cancelled' ? 'selected' : ''}>❌ Đã hủy</option>
+                            </select>
+                        </td>
+                        <td><button class="del-btn" onclick="delDoc('orders','${d.id}')"><i class="fa-solid fa-trash"></i> Xóa</button></td>
+                    </tr>`;
+            });
+            
+            document.getElementById("total-revenue").innerText = rev.toLocaleString() + "đ";
+            document.getElementById("total-orders").innerText = orderCount;
+        }
+
+        // Cập nhật trạng thái Đơn hàng
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            try {
+                await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+                window.loadData();
+            } catch (error) {
+                alert("Lỗi khi cập nhật trạng thái: " + error.message);
+            }
+        };
+
+        // Form Thêm/Sửa Sản phẩm
+        document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const btnSubmit = document.getElementById("btnSubmitProduct");
+            btnSubmit.innerText = "Đang xử lý dữ liệu...";
+            btnSubmit.disabled = true;
+
+            const productData = {
+                name: document.getElementById("pName").value,
+                brand: document.getElementById("pBrand").value,
+                price: Number(document.getElementById("pPrice").value),
+                discount: Number(document.getElementById("pDiscount").value),
+                order: Number(document.getElementById("pOrder").value),
+                image: document.getElementById("pImage").value,
+                description: document.getElementById("pDesc").value,
+                isFeatured: document.getElementById("pFeatured").checked
+            };
+
+            try {
+                if (window.editingProductId) {
+                    productData.updatedAt = new Date().toISOString();
+                    await updateDoc(doc(db, "shoes", window.editingProductId), productData);
+                    alert("Cập nhật thông tin sản phẩm thành công!");
+                    window.cancelEditMode(); 
+                } else {
+                    productData.createdAt = new Date().toISOString();
+                    await addDoc(collection(db, "shoes"), productData);
+                    alert("Đã thêm sản phẩm mới thành công vào hệ thống!");
+                    document.getElementById("addProductForm").reset();
+                }
+                window.loadData(); 
+            } catch (error) {
+                alert("Xảy ra lỗi khi lưu dữ liệu: " + error.message);
+            } finally {
+                btnSubmit.innerText = window.editingProductId ? "Lưu Thay Đổi Sản Phẩm" : "Thêm Sản Phẩm Vào Kho";
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // Vào chế độ Sửa
+        window.enterEditMode = function(id) {
+            const product = window.globalProducts.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById("pName").value = product.name || '';
+            document.getElementById("pBrand").value = product.brand || '';
+            document.getElementById("pPrice").value = product.price || '';
+            document.getElementById("pDiscount").value = product.discount || 0;
+            document.getElementById("pOrder").value = product.order || 1;
+            document.getElementById("pImage").value = product.image || '';
+            document.getElementById("pDesc").value = product.description || '';
+            document.getElementById("pFeatured").checked = product.isFeatured || false;
+
+            window.editingProductId = id;
+            document.getElementById("formTitle").innerText = "Chỉnh Sửa Sản Phẩm";
+            
+            const btnSubmit = document.getElementById("btnSubmitProduct");
+            btnSubmit.innerText = "Lưu Thay Đổi Sản Phẩm";
+            btnSubmit.classList.add("btn-update");
+
+            document.getElementById("btnCancelEdit").style.display = "block";
+            document.getElementById("addProductForm").scrollIntoView({behavior: "smooth", block: "start"});
+        };
+
+        // Hủy chế độ Sửa
+        window.cancelEditMode = function() {
+            window.editingProductId = null;
+            document.getElementById("addProductForm").reset();
+            
+            document.getElementById("formTitle").innerText = "Thêm Sản Phẩm Mới";
+            
+            const btnSubmit = document.getElementById("btnSubmitProduct");
+            btnSubmit.innerText = "Thêm Sản Phẩm Vào Kho";
+            btnSubmit.classList.remove("btn-update");
+
+            document.getElementById("btnCancelEdit").style.display = "none";
+        };
+
+        // Hàm Xóa Dữ Liệu Chung
+        window.delDoc = async function(collectionName, id) {
+            if (confirm("Bạn có chắc chắn muốn xóa bản ghi này? Thao tác không thể hoàn tác!")) {
+                try {
+                    await deleteDoc(doc(db, collectionName, id));
+                    window.loadData();
+                    if (collectionName === 'subscribers') {
+                        window.loadSubscribers();
+                    }
+                } catch (error) {
+                    alert("Lỗi khi xóa dữ liệu: " + error.message);
+                }
+            }
+        };
+
+        // LOGIC LẤY DANH SÁCH KHÁCH ĐĂNG KÝ (Được di chuyển vào trong thẻ module)
+        window.loadSubscribers = async function() {
+            try {
+                const sSnap = await getDocs(collection(db, "subscribers"));
+                const sList = document.getElementById("admin-subscriber-list");
+                sList.innerHTML = "";
+                
+                sSnap.forEach(d => {
+                    let s = d.data();
+                    let dateStr = s.createdAt ? new Date(s.createdAt).toLocaleString('vi-VN') : 'Không rõ ngày';
+                    sList.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 600;">${s.email}</td>
+                            <td>${dateStr}</td>
+                            <td><button class="del-btn" onclick="delDoc('subscribers','${d.id}')"><i class="fa-solid fa-trash"></i> Xóa</button></td>
+                        </tr>`;
+                });
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách subscriber:", error);
+            }
+        }
+
+        // Tự động Load dữ liệu khi trang vừa mở
+        document.addEventListener("DOMContentLoaded", () => {
+            window.loadData();
+            window.loadSubscribers();
+        });
+
+    </script>
+
+</body>
+</html>

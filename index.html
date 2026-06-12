@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bet ker - Giày Thể Thao Chính Hãng</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Hiệu ứng cơ bản */
+        #btn-load-more:hover { background: #ff4500 !important; transform: translateY(-2px); }
+        .product-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; transform: translateY(-5px); }
+        .clickable { cursor: pointer; transition: color 0.2s; }
+        .clickable:hover { color: #ff4500 !important; }
+
+        /* ================= CSS CHO POPUP (MODAL) CHI TIẾT SẢN PHẨM ================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 9999;
+            display: none; /* Ẩn mặc định */
+            justify-content: center; align-items: center;
+            opacity: 0; animation: fadeIn 0.3s forwards;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+        
+        .modal-content {
+            background: #fff; width: 90%; max-width: 850px; 
+            border-radius: 12px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; max-height: 90vh;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            transform: translateY(20px); animation: slideUp 0.3s forwards;
+        }
+        @keyframes slideUp { to { transform: translateY(0); } }
+
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; font-size: 30px; 
+            cursor: pointer; z-index: 10; color: #555; transition: 0.2s;
+            background: #f4f5f7; width: 40px; height: 40px; 
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+        }
+        .close-modal:hover { background: #ff4500; color: #fff; }
+
+        .modal-body {
+            display: flex; gap: 30px; padding: 40px; overflow-y: auto;
+        }
+        .modal-img-wrapper { flex: 1; display: flex; align-items: center; justify-content: center;}
+        .modal-img-wrapper img { width: 100%; border-radius: 8px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .modal-info { flex: 1; display: flex; flex-direction: column; }
+        .modal-desc { 
+            white-space: pre-wrap; color: #555; line-height: 1.8; 
+            background: #f9f9f9; padding: 15px; border-radius: 8px; 
+            border-left: 4px solid #ff4500; margin-top: 15px;
+            font-size: 14px; max-height: 200px; overflow-y: auto;
+        }
+
+        /* Responsive Modal cho điện thoại */
+        @media (max-width: 768px) {
+            .modal-body { flex-direction: column; padding: 20px; }
+            .modal-img-wrapper img { max-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-bar-container">
+            <div class="top-bar-left">
+                <i class="fa-solid fa-bolt text-primary"></i> Đăng ký thành viên - Nhận ngay Voucher giảm 10% cho đơn hàng đầu tiên!
+            </div>
+            <div class="top-bar-right">
+                <span><i class="fa-solid fa-phone"></i> Hotline: 0866.229.924</span>
+                <span class="separator">|</span>
+                <a href="#" class="top-link"><i class="fa-solid fa-location-dot"></i> Hệ thống cửa hàng</a>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                Bet ker<span></span>
+            </a>
+
+            <div class="search-wrapper">
+                <form class="search-form" id="searchForm" onsubmit="event.preventDefault();">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm mẫu giày, thương hiệu bạn yêu thích...">
+                    <button type="submit" title="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </form>
+            </div>
+
+            <div class="user-actions">
+                <a href="dangnhap.html" title="Tài khoản cá nhân" class="action-btn" id="btnUserAccount">
+                    <i class="fa-regular fa-user"></i>
+                    <span class="action-text" id="accountText">Tài khoản</span>
+                </a>
+                <a href="admin.html" title="Quản trị" class="action-btn admin-btn" id="btnAdminNav" style="display: none;">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span class="action-text">Quản trị</span>
+                </a>
+                <a href="giohang.html" title="Giỏ hàng của bạn" class="action-btn cart-btn">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="cart-count" id="globalCartCount">0</span>
+                    </div>
+                    <span class="action-text">Giỏ hàng</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> Trang Chủ</a></li>
+                <li><a href="gioithieu.html"><i class="fa-solid fa-info-circle"></i> Giới Thiệu</a></li>
+                <li class="dropdown">
+                    <a href="#all-product-section">Sản Phẩm <i class="fa-solid fa-caret-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#all-product-section" onclick="triggerFilter('nike')">Giày Nike</a></li>
+                        <li><a href="#all-product-section" onclick="triggerFilter('adidas')">Giày Adidas</a></li>
+                        <li><a href="#all-product-section" onclick="triggerFilter('jordan')">Giày Jordan</a></li>
+                        <li><a href="#all-product-section" onclick="triggerFilter('puma')">Giày Puma</a></li>
+                    </ul>
+                </li>
+                <li><a href="lienhe.html"><i class="fa-solid fa-phone"></i> Liên Hệ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="banner-hero">
+        <div class="banner-slider">
+            <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=1920&h=550&q=80" alt="Leopard Store New Collection" class="banner-img" style="width: 100%; height: 550px; object-fit: cover;">
+            <div class="banner-overlay">
+                <div class="banner-content container">
+                    <span class="tag-trending">XU HƯỚNG MỚI NHẤT</span>
+                    <h2>BỨC PHÁ GIỚI HẠN<br>NÂNG TẦM PHONG CÁCH</h2>
+                    <p>Khám phá bộ sưu tập những mẫu Sneaker thế hệ mới, ôm chân, êm ái và dẫn đầu xu hướng thời trang đường phố.</p>
+                    <a href="#all-product-section" class="btn-shop-now">Mua Ngay <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section class="service-policies" style="margin-top: 40px;">
+            <div class="policy-grid" style="display: flex; justify-content: space-between; text-align: center; gap: 20px;">
+                <div class="policy-item">
+                    <div class="policy-icon-box" style="font-size: 30px; color: #ff4500;"><i class="fa-solid fa-truck-fast"></i></div>
+                    <div class="policy-text"><h4>Giao hàng siêu tốc</h4><p>Miễn phí toàn quốc cho đơn từ 1tr</p></div>
+                </div>
+                <div class="policy-item">
+                    <div class="policy-icon-box" style="font-size: 30px; color: #ff4500;"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    <div class="policy-text"><h4>Thanh toán linh hoạt</h4><p>Hỗ trợ COD hoặc chuyển khoản 0%</p></div>
+                </div>
+                <div class="policy-item">
+                    <div class="policy-icon-box" style="font-size: 30px; color: #ff4500;"><i class="fa-solid fa-medal"></i></div>
+                    <div class="policy-text"><h4>Chính hãng 100%</h4><p>Hoàn tiền gấp 10 lần nếu phát hiện fake</p></div>
+                </div>
+                <div class="policy-item">
+                    <div class="policy-icon-box" style="font-size: 30px; color: #ff4500;"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="policy-text"><h4>Bảo hành vàng</h4><p>Đổi size, đổi mẫu thoải mái trong 30 ngày</p></div>
+                </div>
+            </div>
+        </section>
+
+        <main id="featured-product-section" style="margin-top: 60px;">
+            <div class="section-title-wrapper" style="text-align: center; margin-bottom: 30px;">
+                <span class="sub-title" style="color: #ff4500; font-weight: bold;">Khám Phá Bộ Sưu Tập</span>
+                <h2 class="section-title" style="font-size: 28px; text-transform: uppercase;">Sản Phẩm Nổi Bật</h2>
+                <div class="title-line" style="width: 50px; height: 3px; background: #ff4500; margin: 10px auto;"></div>
+            </div>
+
+            <div class="product-grid" id="featured-product-list" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                <div class="loading-box" style="grid-column: 1 / -1; text-align: center; padding: 40px 0;">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: #ff4500;"></i>
+                </div>
+            </div>
+        </main>
+        
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 60px 0;">
+
+        <main id="all-product-section">
+            <div class="section-title-wrapper" style="text-align: center; margin-bottom: 30px;">
+                <h2 class="section-title" style="font-size: 28px; text-transform: uppercase;">Tất Cả Sản Phẩm</h2>
+                <div class="title-line" style="width: 50px; height: 3px; background: #ff4500; margin: 10px auto;"></div>
+            </div>
+
+            <div class="controls-wrapper" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+                <div class="category-filters" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="filter-btn active" data-filter="all" style="padding: 10px 22px; border: 1px solid #ddd; cursor: pointer; border-radius: 20px; background: #ff4500; color: #fff; font-weight: 500;">Tất Cả Hãng</button>
+                    <button class="filter-btn" data-filter="nike" style="padding: 10px 22px; border: 1px solid #ddd; cursor: pointer; border-radius: 20px; background: transparent; color: #333; font-weight: 500;">Nike</button>
+                    <button class="filter-btn" data-filter="adidas" style="padding: 10px 22px; border: 1px solid #ddd; cursor: pointer; border-radius: 20px; background: transparent; color: #333; font-weight: 500;">Adidas</button>
+                    <button class="filter-btn" data-filter="jordan" style="padding: 10px 22px; border: 1px solid #ddd; cursor: pointer; border-radius: 20px; background: transparent; color: #333; font-weight: 500;">Jordan</button>
+                    <button class="filter-btn" data-filter="puma" style="padding: 10px 22px; border: 1px solid #ddd; cursor: pointer; border-radius: 20px; background: transparent; color: #333; font-weight: 500;">Puma</button>
+                </div>
+
+                <div class="sort-wrapper" id="sortWrapper">
+                    <label for="priceSort" style="font-weight: 600; margin-right: 10px; color: #444;"><i class="fa-solid fa-arrow-down-up-lock"></i> Sắp xếp giá:</label>
+                    <select id="priceSort" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; background: #fff; cursor: pointer; font-weight: 500; color: #333;">
+                        <option value="default">Mới nhất / Mặc định</option>
+                        <option value="low-to-high">Từ thấp đến cao ↑</option>
+                        <option value="high-to-low">Từ cao đến thấp ↓</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="product-grid" id="all-product-list" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <button id="btn-load-more" style="display: none; padding: 12px 35px; background: #1a1a1a; color: #fff; border: none; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; outline: none;">
+                    Xem Thêm Sản Phẩm <i class="fa-solid fa-angle-down" style="margin-left: 5px;"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="productModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <div class="modal-body" id="modalBody">
+                </div>
+        </div>
+    </div>
+ <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo footer-logo">BET <span>KER</span></a>
+                    <p class="company-desc">Hệ thống phân phối giày thể thao Sneaker chính hãng hàng đầu Việt Nam. Mang lại trải nghiệm di chuyển tuyệt vời trên từng bước chân.</p>
+                    <ul class="contact-details">
+                        <li><i class="fa-solid fa-location-dot"></i> <span>Địa chỉ: Quận Kiến An, Thành phố Hải Phòng</span></li>
+                        <li><i class="fa-solid fa-phone"></i> <span>Hotline mua hàng: 0866.229.924</span></li>
+                        <li><i class="fa-solid fa-envelope"></i> <span>Email hỗ trợ: admin@betker.vn</span></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Hướng Dẫn & Trợ Giúp</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Hướng dẫn mua hàng Online</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy trình giao nhận & vận chuyển</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Quy định đổi trả & hoàn tiền</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo mật thông tin</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Bảng tính size giày chuẩn</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Chính Sách Cửa Hàng</h4>
+                    <ul>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Khách hàng thân thiết (VIP)</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Chính sách bảo hành sản phẩm</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Điều khoản và điều kiện dịch vụ</a></li>
+                        <li><a href="#"><i class="fa-solid fa-chevron-right"></i> Đăng ký cộng tác viên (CTV)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+    <h4>Đăng Ký Khuyến Mãi</h4>
+    <p>Nhập email để nhận thông tin ưu đãi mới nhất.</p>
+    <div class="newsletter-box" style="display: flex; gap: 5px; margin-top: 10px;">
+        <input type="email" id="newsletterEmail" placeholder="Email của bạn..." style="padding: 10px; border-radius: 4px; border: none; flex: 1;">
+        <button type="button" id="btnNewsletter" style="padding: 10px 15px; background: var(--primary-color); border: none; color: white; cursor: pointer;">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { db, auth } from "./firebase-config.js";
+        // Đã cập nhật: thêm addDoc vào dòng import này
+        import { collection, getDocs, doc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Biến trạng thái toàn cục
+        let allProducts = [];
+        let currentBrand = "all";          
+        let currentSort = "default";       
+        let searchQuery = "";              
+        let displayLimit = 10;             
+
+        // 1. Kiểm tra tài khoản
+        onAuthStateChanged(auth, async (user) => {
+            const accountText = document.getElementById("accountText");
+            const btnAdminNav = document.getElementById("btnAdminNav");
+            if (user) {
+                accountText.innerText = user.displayName || "Tài khoản";
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().role === "admin") {
+                    btnAdminNav.style.display = "flex";
+                }
+            } else {
+                accountText.innerText = "Đăng nhập";
+            }
+        });
+
+        // 2. Cập nhật Số lượng trong Giỏ Hàng
+        function updateGlobalCartCount() {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartBadge = document.getElementById("globalCartCount");
+            if (cartBadge) cartBadge.innerText = totalCount;
+        }
+
+        // 3. Hàm tạo Thẻ Giao diện 1 Sản Phẩm (Bổ sung sự kiện onClick để mở Chi Tiết)
+        window.generateProductCard = function(p) {
+            let currentPrice = p.price;
+            if (p.discount > 0) {
+                currentPrice = p.price - (p.price * p.discount / 100);
+            }
+            let discountBadge = p.discount > 0 ? `<span style="position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; z-index: 10; font-weight: bold;">-${p.discount}%</span>` : '';
+
+            return `
+                <div class="product-card" style="border: 1px solid #eee; border-radius: 8px; overflow: hidden; position: relative; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: 0.3s;">
+                    ${discountBadge}
+                    <img src="${p.image}" alt="${p.name}" class="clickable" onclick="openProductDetail('${p.id}')" style="width: 100%; height: 250px; object-fit: cover;">
+                    <div class="p-details" style="padding: 15px; text-align: center;">
+                        <h3 class="clickable" onclick="openProductDetail('${p.id}')" style="font-size: 16px; margin-bottom: 10px; color: #333; height: 40px; overflow: hidden; line-height: 1.3;">${p.name}</h3>
+                        <p style="color: #ff4500; font-weight: bold; margin-bottom: 15px; font-size: 18px;">
+                            ${currentPrice.toLocaleString()}đ 
+                            ${p.discount > 0 ? `<del style="color:#999; font-size:13px; margin-left:5px; font-weight: normal;">${Number(p.price).toLocaleString()}đ</del>` : ''}
+                        </p>
+                        <button onclick="addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${currentPrice}, '${p.image}')" style="background: #1a1a1a; color: white; border: none; padding: 11px 15px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: 600; transition: 0.3s;">
+                            Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        // 4. Lấy dữ liệu Sản phẩm từ DB Cloud
+        async function loadProductsFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "shoes"));
+                allProducts = [];
+                querySnapshot.forEach((doc) => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+                renderFeaturedProducts();
+                renderAllProducts();
+            } catch (error) {
+                document.getElementById("featured-product-list").innerHTML = "<p style='color:red; grid-column: 1/-1; text-align:center;'>Không thể tải dữ liệu.</p>";
+            }
+        }
+
+        // 5. Render: SẢN PHẨM NỔI BẬT
+        function renderFeaturedProducts() {
+            const featuredList = document.getElementById("featured-product-list");
+            featuredList.innerHTML = "";
+            let featured = [...allProducts].sort((a, b) => (a.order || 99) - (b.order || 99)).slice(0, 4);
+            
+            if (featured.length === 0) {
+                featuredList.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding: 20px 0;'>Chưa có sản phẩm nổi bật.</p>";
+                return;
+            }
+            featured.forEach(p => featuredList.innerHTML += generateProductCard(p));
+        }
+
+        // 6. Render: TẤT CẢ SẢN PHẨM
+        window.renderAllProducts = function() {
+            const allList = document.getElementById("all-product-list");
+            const btnLoadMore = document.getElementById("btn-load-more");
+            allList.innerHTML = "";
+
+            let items = [...allProducts];
+
+            if (searchQuery) items = items.filter(shoe => shoe.name.toLowerCase().includes(searchQuery));
+            if (currentBrand !== "all") items = items.filter(shoe => shoe.brand && shoe.brand.toLowerCase() === currentBrand);
+
+            const getRealPrice = (p) => p.discount > 0 ? p.price - (p.price * p.discount / 100) : p.price;
+            if (currentSort === "low-to-high") items.sort((a, b) => getRealPrice(a) - getRealPrice(b));
+            else if (currentSort === "high-to-low") items.sort((a, b) => getRealPrice(b) - getRealPrice(a));
+            else items.sort((a, b) => (a.order || 99) - (b.order || 99));
+
+            let itemsToShow = items.slice(0, displayLimit);
+
+            if (itemsToShow.length === 0) {
+                allList.innerHTML = "<p style='grid-column: 1/-1; text-align:center; padding: 30px 0; color: #666;'>Không tìm thấy sản phẩm nào.</p>";
+                btnLoadMore.style.display = "none";
+                return;
+            }
+
+            itemsToShow.forEach(p => allList.innerHTML += generateProductCard(p));
+            btnLoadMore.style.display = items.length > displayLimit ? "inline-block" : "none";
+        };
+
+        // ==============================================================
+        // MỚI: LOGIC ĐIỀU KHIỂN POPUP CHI TIẾT SẢN PHẨM
+        // ==============================================================
+        window.openProductDetail = function(id) {
+            // Tìm dữ liệu sản phẩm trong mảng
+            const product = allProducts.find(p => p.id === id);
+            if (!product) return;
+
+            // Tính giá trị thực
+            let currentPrice = product.price;
+            if (product.discount > 0) {
+                currentPrice = product.price - (product.price * product.discount / 100);
+            }
+
+            const modalBody = document.getElementById('modalBody');
+            
+            // Xử lý Mô tả (nếu xuống dòng thì đổi thành thẻ <br>)
+            let descriptionText = product.description ? product.description.replace(/\n/g, '<br>') : "Sản phẩm này chưa có mô tả chi tiết.";
+
+            modalBody.innerHTML = `
+                <div class="modal-img-wrapper">
+                    <img src="${product.image}" alt="${product.name}">
+                </div>
+                <div class="modal-info">
+                    <h2 style="font-size: 26px; color: #222; margin-bottom: 5px; line-height: 1.3;">${product.name}</h2>
+                    <p style="color: #666; text-transform: capitalize; font-weight: 500; font-size: 15px;">Thương hiệu: <span style="color: #ff4500; font-weight: bold;">${product.brand || 'Khác'}</span></p>
+                    
+                    <div style="font-size: 26px; color: #ff4500; font-weight: bold; margin: 15px 0;">
+                        ${currentPrice.toLocaleString()}đ
+                        ${product.discount > 0 ? `<del style="color:#999; font-size:16px; margin-left:10px; font-weight: normal;">${Number(product.price).toLocaleString()}đ</del>` : ''}
+                    </div>
+
+                    <div style="flex-grow: 1;">
+                        <h4 style="margin-bottom: 5px; color: #333; font-size: 16px;">Chi tiết sản phẩm:</h4>
+                        <div class="modal-desc">${descriptionText}</div>
+                    </div>
+
+                    <button onclick="addToCart('${product.id}', '${product.name.replace(/'/g, "\\'")}', ${currentPrice}, '${product.image}')" style="background: #1a1a1a; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; margin-top: 25px; transition: 0.3s; text-transform: uppercase;">
+                        <i class="fa-solid fa-cart-shopping" style="margin-right: 5px;"></i> Thêm Vào Giỏ Hàng
+                    </button>
+                </div>
+            `;
+            
+            // Hiển thị Popup
+            document.getElementById('productModal').style.display = 'flex';
+        };
+
+        window.closeProductModal = function() {
+            document.getElementById('productModal').style.display = 'none';
+        };
+
+        // Đóng modal khi bấm ra ngoài khoảng đen
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('productModal');
+            if (e.target === modal) {
+                closeProductModal();
+            }
+        });
+        // ==============================================================
+
+        // Các sự kiện nút bấm khác (Xem thêm, Lọc hãng, Sắp xếp)
+        document.getElementById("btn-load-more").addEventListener("click", () => {
+            displayLimit += 10; 
+            renderAllProducts();
+        });
+
+        const priceSortSelect = document.getElementById("priceSort");
+        if (priceSortSelect) {
+            priceSortSelect.addEventListener("change", function(e) {
+                currentSort = e.target.value;
+                displayLimit = 10; 
+                renderAllProducts();
+            });
+        }
+        
+        window.triggerFilter = function(category) {
+            currentBrand = category;
+            displayLimit = 10; 
+            document.querySelectorAll(".filter-btn").forEach(b => {
+                b.classList.remove("active");
+                b.style.background = "transparent";
+                b.style.color = "#333";
+            });
+            const filterBtnActive = document.querySelector(`.filter-btn[data-filter="${category}"]`);
+            if (filterBtnActive) {
+                filterBtnActive.classList.add("active");
+                filterBtnActive.style.background = "#ff4500";
+                filterBtnActive.style.color = "#fff";
+            }
+            renderAllProducts();
+        };
+
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                triggerFilter(this.getAttribute("data-filter"));
+            });
+        });
+
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", function(e) {
+                searchQuery = e.target.value.toLowerCase().trim();
+                displayLimit = 10; 
+                renderAllProducts();
+            });
+        }
+
+        // Logic thêm giỏ hàng
+        window.addToCart = function(id, name, price, image) {
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            let existingItem = cart.find(item => item.id === id);
+
+            if (existingItem) existingItem.quantity += 1;
+            else cart.push({ id, name, price, image, quantity: 1, size: 41 });
+
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateGlobalCartCount();
+            alert(`Đã thêm ${name} vào giỏ hàng thành công!`);
+            closeProductModal(); // Đóng popup sau khi thêm thành công
+        };
+
+        // Khởi động
+        document.addEventListener("DOMContentLoaded", () => {
+            loadProductsFromFirebase();
+            updateGlobalCartCount();
+        });
+
+        // Xử lý gửi email đăng ký khuyến mãi
+        document.getElementById("btnNewsletter").addEventListener("click", async () => {
+            const emailInput = document.getElementById("newsletterEmail");
+            const email = emailInput.value.trim();
+
+            if (!email || !email.includes("@")) {
+                alert("Vui lòng nhập email hợp lệ!");
+                return;
+            }
+
+            try {
+                // Đẩy email vào bộ sưu tập "subscribers"
+                await addDoc(collection(db, "subscribers"), {
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+                alert("Cảm ơn bạn đã đăng ký nhận khuyến mãi!");
+                emailInput.value = ""; // Xóa trắng ô nhập
+            } catch (error) {
+                alert("Lỗi: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
